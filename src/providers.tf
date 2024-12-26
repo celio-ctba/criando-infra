@@ -5,9 +5,9 @@ terraform {
       version = "5.81.0"
     }
   }
-    backend "s3" {
-    }
-    #comando q cria o estado dentro do bucket: terraform init -backend-config="bucket=celio-ctba-us-east-1-terraform-statefile" -backend-config="infra-state.tfstate"
+  backend "s3" {
+  }
+  #comando q cria o estado dentro do bucket: terraform init -backend-config="bucket=celio-ctba-us-east-1-terraform-statefile" -backend-config="infra-state.tfstate"
 }
 
 provider "aws" {

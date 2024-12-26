@@ -13,7 +13,17 @@ module "vpc" {
   enable_nat_gateway = true
   enable_vpn_gateway = true
 
-  tags = var.aws_project_tags
+  #inserindo as tags referentes a VPC
+  tags = merge(var.aws_project_tags, { "kubernetes.io/cluster/${var.aws_eks_name}" = "shared" })
+
+  public_subnet_tags = {
+    "kubernetes.io/cluster/${var.aws_eks_name}" = "shared"
+    "kubernetes.io/role/elb"                    = 1
+  }
+  private_subnet_tags = {
+    "kubernetes.io/cluster/${var.aws_eks_name}" = "shared"
+    "kubernetes.io/role/internal-elb"           = 1
+  }
 }
 
 #Esse módulo é o resp. por criar o cluster
@@ -44,6 +54,7 @@ module "eks" {
 
       #tipos de perfis de maquinas
       instance_types = var.aws_eks_managed_node_groups_instance_types
+      tags           = var.aws_project_tags
     }
   }
 
