@@ -1,0 +1,33 @@
+name: "Construindo Infra"
+
+on:
+    push:
+        branches: ["main"]
+        paths: ["src/**"]
+        workflow_dispatch:
+
+jobs:
+    terraform:
+        name: "Terraform Apply"
+        runs-on: "ubuntu-latest"
+
+        steps:
+            - name: "Configurando acesso do Github Actions na AWS"
+              uses: aws-actions/configure-aws-credentials@v4
+              with:
+                aws-region: us-east-1
+                aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}    
+            
+            #Essa action é responsável por pegar o código    
+            - name: Checkout
+              uses: actions/checkout@v4
+
+            #Essa actions inicializa o Terraform e cria o bucket S3 para armazenar os arquivos de estado
+            - name: Terraform init
+              working-directory: ./src  
+              run: terraform init -backend-config="bucket=${{ secrets.AWS_BUCKET_NAME }}" -backend-config="key=${{ secrets.AWS_BUCKET_FILE }}"  
+
+            - name: Terraform Apply
+              working-directory: ./src
+              run: terraform apply --auto-approve  
